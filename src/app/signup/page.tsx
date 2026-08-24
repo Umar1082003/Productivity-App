@@ -25,6 +25,8 @@ type SignupFormData = z.infer<typeof signupSchema>;
 
 function Signup() {
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
   const form = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
@@ -45,8 +47,7 @@ function Signup() {
       });
 
       if (error) {
-        console.error("Error signing up:", error);
-        return;
+        setErrorMsg(error.message);
       }
       console.log("User signed up:", authData);
     } catch (error) {
@@ -54,17 +55,30 @@ function Signup() {
       setLoading(false);
     } finally {
       setLoading(false);
+      setSuccessMsg(
+        "Account created successfully! Please check your email to verify your account.",
+      );
     }
   };
 
   return (
     <div className="relative w-full min-h-screen flex justify-center items-center py-3">
-      <div className="bgClass absolute inset-0"></div>
+      <div className="bg-[#0B0B10] absolute inset-0"></div>
 
-      <div className="glass-card relative z-10 w-[90%] sm:w-125  px-9 py-6">
-        <h2 className="text-[#815bda] border-s-4 px-3 my-4 mb-7 text-4xl font-bold">
+      <div className="relative z-10 w-[90%] sm:w-125 px-9 py-6 bg-[#15151E] rounded-2xl border border-[#292936] shadow-md/30 shadow-[#8B5CF6]/50">
+        <h2 className="text-[#F5F5F7] border-s-4 px-3 my-4 mb-7 text-4xl font-bold">
           Sign up
         </h2>
+        {errorMsg && (
+          <div className="bg-red-100 text-red-700 p-2 mb-4 rounded">
+            {errorMsg}
+          </div>
+        )}
+        {successMsg && (
+          <div className="bg-green-100 text-green-700 p-2 mb-4 rounded">
+            {successMsg}
+          </div>
+        )}
         <form
           className="flex flex-col gap-2"
           onSubmit={form.handleSubmit(onSubmit)}
@@ -77,7 +91,7 @@ function Signup() {
               <input
                 type="text"
                 id="fullName"
-                className="border p-2 glass-card-btn mb-2"
+                className="bg-[#101017] border border-[#292936] rounded p-2 mb-2"
                 placeholder="Full Name"
                 {...form.register("fullName")}
               />
@@ -94,7 +108,7 @@ function Signup() {
               <input
                 type="text"
                 id="username"
-                className="border p-2 glass-card-btn mb-2"
+                className="bg-[#101017] border border-[#292936] rounded p-2 mb-2"
                 placeholder="Username"
                 {...form.register("username")}
               />
@@ -111,7 +125,7 @@ function Signup() {
           <input
             type="email"
             id="email"
-            className="border p-2 glass-card-btn mb-2"
+            className="bg-[#101017] border border-[#292936] rounded p-2 mb-2"
             placeholder="Email"
             {...form.register("email")}
           />
@@ -126,7 +140,7 @@ function Signup() {
           <input
             type="password"
             id="password"
-            className="border p-2 glass-card-btn mb-2"
+            className="bg-[#101017] border border-[#292936] rounded p-2 mb-2"
             placeholder="Password"
             {...form.register("password")}
           />
@@ -144,7 +158,7 @@ function Signup() {
           <input
             type="password"
             id="confirm-password"
-            className="border p-2 glass-card-btn mb-2"
+            className="bg-[#101017] border border-[#292936] rounded p-2 mb-2 placeholder:text-[#666674]"
             placeholder="Confirm Password"
             {...form.register("confirmPassword")}
           />
@@ -156,14 +170,17 @@ function Signup() {
           <button
             type="submit"
             disabled={loading}
-            className="submitBtn bg-[#815bda] text-white p-2 rounded cursor-pointer my-3"
+            className="submitBtn bg-[#8B5CF6] hover:bg-[#7C3AED] text-white p-2 rounded cursor-pointer my-3 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Loading..." : "Create Account"}
             {/* Create Account */}
           </button>
-          <p className="text-center">
+          <p className="text-center text-[#9A9AA6]">
             Already have an account?
-            <a href="/login" className="text-[#815bda] hover:underline ms-2">
+            <a
+              href="/login"
+              className="text-[#8B5CF6] hover:text-[#7C3AED] hover:underline ms-2"
+            >
               Log in
             </a>
           </p>
