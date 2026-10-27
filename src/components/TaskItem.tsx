@@ -22,17 +22,7 @@ type Task = {
 };
 
 type TaskItemProps = {
-  userTasks: {
-    id: string;
-    title: string;
-    description: string | null;
-    priority: "high" | "medium" | "low";
-    status: "todo" | "in-progress" | "completed";
-    due_date: string | null;
-    created_at: string;
-  }[];
-  // openTask: object;
-  // toggleTask: (id: string) => void;
+  userTasks: Task[];
   deleteTask: (id: string) => void;
   completeTask: (id: string, status: string) => void;
   handleViewTask: (task: Task) => void;
@@ -40,23 +30,20 @@ type TaskItemProps = {
   taskToDelete: Task | null;
   setTaskToDelete: (task: Task | null) => void;
   loadingDelete: boolean;
-  formatDueDate: (date: string | null) => string;
+  // formatDueDate: (date: string | null) => string;
 };
 
 function TaskItem({
   userTasks,
-  // openTask,
-  // toggleTask,
   deleteTask,
   completeTask,
   handleViewTask,
   taskToDelete,
   setTaskToDelete,
   loadingDelete,
-  formatDueDate,
+  // formatDueDate,
 }: TaskItemProps) {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
-  // const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
 
   const handleOpenMenu = async (id: string) => {
     setOpenMenu((prev) => (prev === id ? null : id));
@@ -100,28 +87,12 @@ function TaskItem({
       deadline.getMonth() === tomorrow.getMonth() &&
       deadline.getDate() === tomorrow.getDate();
 
-
     if (isTomorrow) {
       return `Tomorrow, ${deadline.toLocaleTimeString("en-US", {
         hour: "numeric",
         minute: "2-digit",
       })}`;
     }
-
-    // const yesterday = new Date(now);
-    // yesterday.setDate(now.getDate() - 1);
-
-    // const isYesterday =
-    //   deadline.getFullYear() === yesterday.getFullYear() &&
-    //   deadline.getMonth() === yesterday.getMonth() &&
-    //   deadline.getDate() === yesterday.getDate();
-
-    // if (isYesterday) {
-    //   return `Yesterday, ${deadline.toLocaleTimeString("en-US", {
-    //     hour: "numeric",
-    //     minute: "2-digit",
-    //   })}`;
-    // }
 
     return deadline.toLocaleString("en-US", {
       month: "short",
@@ -137,7 +108,7 @@ function TaskItem({
         <div
           key={task.id}
           className={`grid grid-cols-[40px_1fr_150px_110px_130px_40px] items-center border-b border-white/5 px-4 py-4 transition-all hover:translate-x-1.5 cursor-pointer ${task.status === "completed" ? "bg-[#41414249] blur-[1px] hover:bg-transition cursor-not-allowed" : "hover:bg-[#28282a1e] transition-all rounded-lg hover:rounded-2xl"}`}
-        >
+         >
           {/* Checkbox */}
           <label className="relative flex h-5 w-5 cursor-pointer items-center justify-center">
             <input
@@ -170,12 +141,6 @@ function TaskItem({
               >
                 {task.title}
               </p>
-
-              {/* {task.category && (
-                <span className="rounded-full bg-purple-500/10 px-2 py-1 text-xs text-purple-400">
-                  {task.category}
-                </span>
-              )} */}
             </div>
 
             {task.description ? (
@@ -185,12 +150,6 @@ function TaskItem({
             ) : (
               <p className="mt-1 text-xs text-gray-500">Description</p>
             )}
-
-            {/* {task.notes && (
-              <p className="mt-1 text-xs text-gray-500">
-                📝 {task.notes} notes
-              </p>
-            )} */}
           </div>
 
           {/* Due date */}

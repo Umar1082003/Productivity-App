@@ -116,13 +116,6 @@ function SideBar() {
           <FiLogOut size={20} />
           <span>{btnLoading ? "Logging out..." : "Logout"}</span>
         </div>
-        {/* <button
-        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-        onClick={handleLogout}
-        disabled={btnLoading}
-      >
-        {btnLoading ? "Logging out..." : "Logout"}
-      </button> */}
 
         <div className="flex gap-2 border-y-2 border-[#211936] bg-[#19142367] p-2 py-4 mt-4 rounded-sm items-center shadow-sm shadow-[#8B5CF6]/10">
           <div className="w-10 h-10 bg-gray-500 rounded-full"></div>

@@ -30,6 +30,14 @@ type TaskType = {
   created_at: string;
 };
 
+type Subtask = {
+  id: string;
+  task_id: string;
+  title: string;
+  completed: boolean;
+  created_at: string;
+};
+
 function TaskPage() {
   const [taskFormIsOpen, setTaskFormIsOpen] = useState(false);
   const [userTasks, setUserTasks] = useState<TaskType[]>([]);
@@ -48,6 +56,10 @@ function TaskPage() {
   const [isEditing, setIsEditing] = useState(false);
 
   const [taskToDelete, setTaskToDelete] = useState<TaskType | null>(null);
+
+  const [subtasks, setSubtasks] = useState<Subtask[]>([]);
+  const [newSubtask, setNewSubtask] = useState<string>("");
+  const [loadingSubtasks, setLoadingSubtasks] = useState(false);
 
   // get session
   useEffect(() => {
@@ -175,6 +187,109 @@ function TaskPage() {
     );
     return true;
   };
+  // update subtask
+  // const updateSubTask = async (subtask: Subtask): Promise<boolean> => {
+  //   const { error } = await supabase
+  //     .from("subtasks")
+  //     .update({
+  //       title: subtask?.title,
+  //     })
+  //     .eq("id", subtask?.id);
+
+  //   if (error) {
+  //     console.log(error);
+  //     return false;
+  //   }
+
+  //   setSubtasks(
+  //     subtasks.map((item) =>
+  //       item.id === subtask?.id
+  //         ? {
+  //             ...item,
+  //             title: subtask?.title,
+  //           }
+  //         : item,
+  //     ),
+  //   );
+  //   return true;
+  // };
+
+  // get subtasks
+
+  const fetchSubtasks = async () => {
+    if (!selectedTask) return;
+    setLoadingSubtasks(true);
+
+    const { data: subtasks, error } = await supabase
+      .from("subtasks")
+      .select("*")
+      .eq("task_id", selectedTask.id);
+
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    setSubtasks(subtasks);
+    setLoadingSubtasks(false);
+    console.log(subtasks);
+  };
+
+  // complete subtasks
+  const toogleSubtask = async (id: string, completed: boolean) => {
+    console.log(completed);
+
+    const newStatus = completed ? false : true;
+    const { error } = await supabase
+      .from("subtasks")
+      .update({ completed: newStatus })
+      .eq("id", id);
+
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    setSubtasks(
+      subtasks.map((prev) =>
+        prev.id === id ? { ...prev, completed: newStatus } : prev,
+      ),
+    );
+    console.log(newStatus);
+  };
+  // delete subtasks
+  const deleteSubtask = async (id: string) => {
+    const { error } = await supabase.from("subtasks").delete().eq("id", id);
+
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    setSubtasks(subtasks.filter((subtask) => subtask.id !== id));
+  };
+
+  const addSubtask = async () => {
+    if (!newSubtask || !selectedTask) return;
+
+    const { data, error } = await supabase
+      .from("subtasks")
+      .insert({
+        task_id: selectedTask.id,
+        title: newSubtask,
+        completed: false,
+      })
+      .select("*")
+      .single();
+
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    setSubtasks((prev) => [...prev, data]);
+    setNewSubtask("");
+  };
 
   const handleViewTask = (task: TaskType) => {
     console.log(task);
@@ -189,6 +304,12 @@ function TaskPage() {
 
     fetchTasks();
   }, []);
+
+  useEffect(() => {
+    if (!selectedTask) return;
+
+    fetchSubtasks();
+  }, [selectedTask]);
 
   // due date
   const formatDueDate = (date: string | null) => {
@@ -261,7 +382,7 @@ function TaskPage() {
                 </button>
               </div>
             </div>
-            {/* ////////////////header/////////////// */}
+
             {/* form header */}
             <div className="flex justify-between items-center mb-4 pb-4 border-b border-[#292936]">
               {/* <button>All</button> */}
@@ -293,7 +414,7 @@ function TaskPage() {
                 </Button>
               </div>
             </div>
-            {/* //////form header////// */}
+
             {/* task list */}
             <TaskList
               userTasks={userTasks}
@@ -309,8 +430,7 @@ function TaskPage() {
               loadingDelete={loadingDelete}
               formatDueDate={formatDueDate}
             />
-            {/* <Pagenation /> */}
-            {/* /////////task list///// */}
+
             {taskFormIsOpen && (
               <TaskForm
                 setTaskFormIsOpen={setTaskFormIsOpen}
@@ -327,6 +447,14 @@ function TaskPage() {
               taskToDelete={taskToDelete}
               setTaskToDelete={setTaskToDelete}
               formatDueDate={formatDueDate}
+              subtasks={subtasks}
+              setSubtasks={setSubtasks}
+              toogleSubtask={toogleSubtask}
+              deleteSubtask={deleteSubtask}
+              addSubtask={addSubtask}
+              newSubtask={newSubtask}
+              setNewSubtask={setNewSubtask}
+              loadingSubtasks={loadingSubtasks}
             />
           </div>
         </div>

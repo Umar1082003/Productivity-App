@@ -14,6 +14,7 @@ import StatusDropdown from "./StatusDropdown";
 import { IoAddOutline } from "react-icons/io5";
 import { IoMdCloseCircleOutline } from "react-icons/io";
 import { Button } from "./ui/button";
+import { MdOutlineDeleteOutline } from "react-icons/md";
 
 const taskSchema = z.object({
   task: z.string().min(1).max(100),
@@ -25,25 +26,26 @@ const taskSchema = z.object({
 });
 
 type taskdata = z.infer<typeof taskSchema>;
-
 type Priority = "high" | "medium" | "low";
 type Status = "todo" | "in-progress" | "completed";
-
 type TaskFormProps = {
   setTaskFormIsOpen: (isOpen: boolean) => void;
   getTasks: () => void;
-  formatDueDate: (date: string | null) => void;
+  // formatDueDate: (date: string | null) => void;
 };
 
 function TaskForm({
   setTaskFormIsOpen,
   getTasks,
-  formatDueDate,
+  // formatDueDate,
 }: TaskFormProps) {
   const [priority, setPriority] = useState<Priority>("medium");
   const [status, setStatus] = useState<Status>("todo");
 
   const [createLoading, setCreateLoading] = useState(false);
+
+  const [subtasks, setSubtasks] = useState<string[]>([]);
+  const [newSubtask, setNewSubtask] = useState("");
 
   const form = useForm<taskdata>({
     resolver: zodResolver(taskSchema),
@@ -53,6 +55,7 @@ function TaskForm({
   const onsubmit = async (taskData: taskdata) => {
     setCreateLoading(true);
     const { data, error } = await supabase.auth.getUser();
+
     console.log(data);
     console.log(data.user?.id);
 
@@ -62,21 +65,48 @@ function TaskForm({
       return;
     }
 
-    const { error: insertError } = await supabase.from("tasks").insert({
-      user_id: data.user?.id,
-      title: taskData.task,
-      description: taskData.description,
-      priority: priority,
-      status: status,
-      due_date: taskData.due_date || null,
-      // Tags: ,
-    });
+    const { data: newTask, error: insertError } = await supabase
+      .from("tasks")
+      .insert({
+        user_id: data.user?.id,
+        title: taskData.task,
+        description: taskData.description,
+        priority: priority,
+        status: status,
+        due_date: taskData.due_date || null,
+      })
+      .select("id")
+      .single();
 
     if (insertError) {
       console.log(console.log(insertError));
       setCreateLoading(false);
       return;
     }
+
+    if (!newTask?.id) {
+      console.log("Task ID is missing");
+      return;
+    }
+
+    // if (subtasks.length > 0) {
+      const { error: subtasksError } = await supabase.from("subtasks").insert(
+        subtasks.map((title) => ({
+          task_id: newTask.id,
+          title,
+          completed: false,
+        })),
+      );
+
+      console.log("NEW TASK:", newTask);
+      console.log("NEW TASK ID:", newTask?.id);
+
+      if (subtasksError) {
+        console.log(subtasksError);
+        return;
+      }
+    // }
+
     console.log("Task created successfully!");
     setCreateLoading(false);
     setTaskFormIsOpen(false);
@@ -169,13 +199,51 @@ function TaskForm({
           >
             SubTasks
           </label>
-          <Button
-            variant="outline"
-            className="w-full justify-start gap-1 text-sm pl-[35%] mb-4 text-gray-600 hover:bg-[#101017ad] cursor-pointer"
-          >
-            <IoAddOutline />
-            Add SubTask
-          </Button>
+          <div className="flex items-center justify-center gap-3">
+            <input
+              type="text"
+              placeholder="Add a subtask"
+              value={newSubtask}
+              {...form.register("subTasks")}
+              onChange={(e) => setNewSubtask(e.target.value)}
+              className="bg-[#10101743] border border-[#292936] rounded px-3 py-1 mb-3 w-full placeholder:text-sm focus-within:outline-none focus-within:ring-0 focus-within:ring-[#8B5CF6] focus-within:border-[#8B5CF6]"
+            />
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (!newSubtask.trim()) return;
+
+                setSubtasks((prev) => [...prev, newSubtask.trim()]);
+                setNewSubtask("");
+              }}
+              className="text-sm mb-3 text-gray-600 hover:bg-[#101017ad] cursor-pointer"
+            >
+              <IoAddOutline />
+              Add SubTask
+            </Button>
+          </div>
+          <div>
+            {subtasks.map((subtask, index) => (
+              <div key={index}>
+                <span>{subtask}</span>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSubtasks((prev) => prev.filter((_, i) => i !== index));
+                  }}
+                  className="text-sm mb-3 text-red-600 hover:bg-red-800 cursor-pointer"
+                >
+                  <MdOutlineDeleteOutline />
+                </button>
+              </div>
+            ))}
+            {form.formState.errors.subTasks && (
+              <span className="text-red-500 text-xs sm:text-sm mb-1">
+                {form.formState.errors.subTasks.message}
+              </span>
+            )}
+          </div>
         </div>
         {/* buttons */}
         <div className="flex justify-end gap-2">

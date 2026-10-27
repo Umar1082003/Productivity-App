@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
 // import PriorityBadge from "./PriorityBadge";
 // import StatusBadge from "./StatusBadge";
 import TaskItem from "./TaskItem";
 import Pagenation from "./Pagenation";
-import ViewTask from "./ViewTask";
 
 type Task = {
   id: string;
@@ -18,15 +16,7 @@ type Task = {
 };
 
 type TaskListProps = {
-  userTasks: {
-    id: string;
-    title: string;
-    description: string | null;
-    priority: "high" | "medium" | "low";
-    status: "todo" | "in-progress" | "completed";
-    due_date: string | null;
-    created_at: string;
-  }[];
+  userTasks: Task[];
   deleteTask: (id: string) => void;
   completeTask: (id: string, status: string) => void;
   isCompleted: boolean;
@@ -52,16 +42,6 @@ export default function TaskList({
   loadingDelete,
   formatDueDate,
 }: TaskListProps) {
-  // const [priority, setPriority] = useState<Priority>("medium");
-  // const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
-  // const [viewTaskSelected, setViewTaskSelected] = useState<object>([]);
-  // const toggleTask = (id: string) => {
-  //   setSelectedTasks((prev) =>
-  //     prev.includes(id)
-  //       ? prev.filter((taskId) => taskId !== id)
-  //       : [...prev, id],
-  //   );
-  // };
 
   return (
     <div className="w-full rounded-xl border border-white/5 bg-[#090d13]">
@@ -106,8 +86,6 @@ export default function TaskList({
             )}
             <TaskItem
               userTasks={userTasks}
-              // openTask={openTask}
-              // toggleTask={toggleTask}
               deleteTask={deleteTask}
               completeTask={completeTask}
               isCompleted={isCompleted}
@@ -115,7 +93,7 @@ export default function TaskList({
               taskToDelete={taskToDelete}
               setTaskToDelete={setTaskToDelete}
               loadingDelete={loadingDelete}
-              formatDueDate={formatDueDate}
+              // formatDueDate={formatDueDate}
             />
           </div>
         )}
