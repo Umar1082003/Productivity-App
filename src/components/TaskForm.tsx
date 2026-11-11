@@ -89,7 +89,6 @@ function TaskForm({
       return;
     }
 
-    // if (subtasks.length > 0) {
       const { error: subtasksError } = await supabase.from("subtasks").insert(
         subtasks.map((title) => ({
           task_id: newTask.id,
@@ -105,7 +104,6 @@ function TaskForm({
         console.log(subtasksError);
         return;
       }
-    // }
 
     console.log("Task created successfully!");
     setCreateLoading(false);

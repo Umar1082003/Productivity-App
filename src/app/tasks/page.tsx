@@ -19,16 +19,18 @@ import { IoIosArrowDown } from "react-icons/io";
 // shadcn ui
 import { Button } from "@/components/ui/button";
 import ViewTask from "@/components/ViewTask";
+// types
+import { TaskType } from "@/types/TaskType";
 
-type TaskType = {
-  id: string;
-  title: string;
-  description: string | null;
-  priority: "high" | "medium" | "low";
-  status: "todo" | "in-progress" | "completed";
-  due_date: string | null;
-  created_at: string;
-};
+// type TaskType = {
+//   id: string;
+//   title: string;
+//   description: string | null;
+//   priority: "high" | "medium" | "low";
+//   status: "todo" | "in-progress" | "completed";
+//   due_date: string | null;
+//   created_at: string;
+// };
 
 type Subtask = {
   id: string;
@@ -187,35 +189,8 @@ function TaskPage() {
     );
     return true;
   };
-  // update subtask
-  // const updateSubTask = async (subtask: Subtask): Promise<boolean> => {
-  //   const { error } = await supabase
-  //     .from("subtasks")
-  //     .update({
-  //       title: subtask?.title,
-  //     })
-  //     .eq("id", subtask?.id);
 
-  //   if (error) {
-  //     console.log(error);
-  //     return false;
-  //   }
-
-  //   setSubtasks(
-  //     subtasks.map((item) =>
-  //       item.id === subtask?.id
-  //         ? {
-  //             ...item,
-  //             title: subtask?.title,
-  //           }
-  //         : item,
-  //     ),
-  //   );
-  //   return true;
-  // };
-
-  // get subtasks
-
+  // ***return***
   const fetchSubtasks = async () => {
     if (!selectedTask) return;
     setLoadingSubtasks(true);
@@ -307,8 +282,10 @@ function TaskPage() {
 
   useEffect(() => {
     if (!selectedTask) return;
-
-    fetchSubtasks();
+    const fetchSubtasksFunc = async () => {
+      fetchSubtasks();
+    };
+    fetchSubtasksFunc();
   }, [selectedTask]);
 
   // due date
@@ -347,9 +324,9 @@ function TaskPage() {
           </h1>
         </>
       ) : (
-        <div className="flex w-full">
+        <div className="flex w-full flex-col md:flex-row">
           <SideBar />
-          <div className="p-4 w-full">
+          <div className="min-w-0 w-full p-4">
             {successMsg && (
               <div className="bg-[#10B981] text-white p-2 mb-4 rounded">
                 {successMsg}
