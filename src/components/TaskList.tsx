@@ -1,7 +1,5 @@
 "use client";
 
-// import PriorityBadge from "./PriorityBadge";
-// import StatusBadge from "./StatusBadge";
 import TaskItem from "./TaskItem";
 import Pagenation from "./Pagenation";
 
@@ -40,7 +38,6 @@ export default function TaskList({
   setTaskToDelete,
   loadingTasks,
   loadingDelete,
-  formatDueDate,
 }: TaskListProps) {
 
   return (
@@ -93,7 +90,6 @@ export default function TaskList({
               taskToDelete={taskToDelete}
               setTaskToDelete={setTaskToDelete}
               loadingDelete={loadingDelete}
-              // formatDueDate={formatDueDate}
             />
           </div>
         )}
